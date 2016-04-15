@@ -1,5 +1,7 @@
 # quick-roman
 
+http://www.meetup.com/got-lambda/events/175796812/
+
 A Clojure library designed to ... well, that part is up to you.
 
 ## Usage
