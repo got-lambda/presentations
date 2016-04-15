@@ -1,0 +1,428 @@
+
+#+TITLE: Introduction to Functional Programming
+
+#+AUTHOR: Jean-Louis Giordano (@jellismymind)
+
+#+DATE: <2015-04-08 Wed>
+
+#+ATTR_LATEX: :height 2cm :align center
+[[./images/clojure_logo.png]] [[./images/haskell_logo.png]] [[./images/python_logo.png]]
+
+* What is FP?
+
+* What is a value?
+
+A value is the final result of a computation.
+
+The value of 1 + 1 is 2.
+
+* What is an expression?
+
+A symbol or combination of symbols that represents a value or a
+relationship between values
+
+1 + 1 is an expression, it reduces to the value 2.
+
+2 is also an expression as well as a value.
+
+* What is evaluation?
+
+Evaluation is the reduction of an expression to its value.
+
+Evaluate: e- (ex-, out) + value
+"To extract the value"
+
+Example of evaluation:
+#+BEGIN_SRC python
+1 + 1 + 1
+1 + 2
+3
+#+END_SRC
+#+BEGIN_SRC
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+#+END_SRC
+
+* What is a variable?
+
+A variable is a reference to a value.
+
+In:
+#+BEGIN_SRC python
+a = 2
+#+END_SRC
+a is a variable, referencing the value 2
+
+* What are side-effects?
+
+A side effect is a step in the evaluation of an expression that has
+effects outside of the expression itself.
+
+Examples:
+#+BEGIN_SRC python
+print "hello"
+
+a = 1; a += 1
+#+END_SRC
+
+#+BEGIN_SRC
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~> Side Effect
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+#+END_SRC
+
+* Statement
+
+A statement is an expression that evaluates to nothing.
+
+** In Python:
+
+Expression:
+#+BEGIN_SRC python
+a = 1 + 1
+a = lambda x: x ** 2
+#+END_SRC
+
+Statement:
+#+BEGIN_SRC python
+if True:
+  a = "hello"
+else:
+  a = "goodbye"
+#+END_SRC
+
+** In Clojure and Haskell
+
+Only expressions
+#+BEGIN_SRC clojure
+(def a
+  (if true "hello" "goodbye"))
+#+END_SRC
+#+BEGIN_SRC haskell
+a = if True
+    then "hello"
+    else "goodbye"
+#+END_SRC
+
+** Why is that?
+
+Statements require side effects,
+intrinsically imperative.
+
+#+BEGIN_SRC
++------------+
+| Statement  |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~> Side Effect
++------------+
+      |
+      X
+#+END_SRC
+
+* What is a function?
+
+A function is an abstraction for an expression, where one or several
+values in the expression are replaced by variables.
+
+Let's abstract the following expression:
+#+BEGIN_SRC python
+1 + 1
+
+def inc (x):
+  return x + 1
+
+inc = lambda x: x + 1
+#+END_SRC
+#+BEGIN_SRC clojure
+(+ 1 1)
+(def inc (fn [x] (+ x 1)))
+(defn inc [x] (+ x 1))
+#+END_SRC
+#+BEGIN_SRC haskell
+1 + 1
+inc = \x -> x + 1
+inc x = 1 + x
+#+END_SRC
+
+Question: Is a function a value?
+
+* What is the arity of a function?
+
+The number of arguments a function takes is its arity.
+#+BEGIN_SRC python
+# arity 0
+def zero ():
+  return 0
+
+# arity 1
+def inc (x):
+  return x + 1
+
+# arity 2
+def add (x, y):
+  return x + y
+#+END_SRC
+
+* Routine vs Function
+
+A routine is an abstraction that do not return a value.
+#+BEGIN_SRC python
+def a (x):
+  print x
+
+def b (x):
+  return x
+#+END_SRC
+a is a routine, b is a function.
+
+A procedure can either be a routine or a function.
+
+* What is a pure function?
+
+A pure function is a side-effect free function that always maps a
+given input to the same output.
+
+Which of the following is a pure function?
+#+BEGIN_SRC python
+def inc (x):
+  return x + 1
+
+def one (x):
+  print x
+  return x
+
+def rand (x):
+  # non deterministic!
+  return x * random.random()
+#+END_SRC
+
+* Immutable vs Mutable
+
+Immutable means that cannot change.
+Think "read only", "constants".
+
+Persistent Datastructures are immutable,
+and can't be updated in-place.
+
+* Referencial Transparency
+
+An expression that is deterministic and without side-effects is
+referencially transparent.
+
+It means it can be replaced by its value without changing the
+behaviour of the program.
+
+* What is Application?
+
+Calling a function with some arguments is applying that function to
+the value of those arguments.
+
+Abstraction and Application are the core concepts of functional
+programming.
+#+BEGIN_SRC python
+f(arg1, arg2)
+1 + 2
+#+END_SRC
+#+BEGIN_SRC clojure
+(f arg1 arg2)
+(+ 1 2)
+#+END_SRC
+#+BEGIN_SRC haskell
+f arg1 arg2
+1 + 2
+(+) 1 2
+#+END_SRC
+
+* Higher order function
+
+Functions can return functions, and take functions as argument.
+
+#+BEGIN_SRC python
+def apply (f, x, y):
+  return f(x, y)
+
+apply(add, 1, 2)
+
+def incrementer (n):
+  return lambda m: m + n
+
+add2 = incrementer(2)
+add2(4)
+#+END_SRC
+
+* Partial Application
+
+Take a function of arity n, and m < n arguments,
+and return a function of arity n - m.
+
+Example:
+#+BEGIN_SRC clojure
+(+ 1 2 3)
+((partial +) 1 2 3)
+((partial + 1) 2 3)
+((partial + 1 2) 3)
+((partial + 1 2 3))
+#+END_SRC
+#+BEGIN_SRC haskell
+1 + 1
+(+) 1 1
+((+) 1) 1
+-- Currying
+#+END_SRC
+
+* Partial Application (bis)
+#+BEGIN_SRC clojure
+(defn part [f & args]
+  (fn [& rest]
+    (apply f (concat args rest))))
+
+((part + 1 2) 3 4)
+#+END_SRC
+
+* How to do things?
+
+** map
+#+BEGIN_SRC clojure
+(map inc [1 2 3])
+#+END_SRC
+** filter
+#+BEGIN_SRC clojure
+(filter even? [1 2 3 4])
+#+END_SRC
+** reduce / fold
+#+BEGIN_SRC clojure
+(reduce + [1 2 3])
+#+END_SRC
+** list comprehension / generators
+#+BEGIN_SRC clojure
+(for [x (range 1 10) :when (even? x)
+      y (range 1 10) :when (odd? y)]
+  (* x y))
+#+END_SRC
+** recursion
+#+BEGIN_SRC clojure
+(defn factorial [n]
+  (if (zero? n)
+    1
+    (* n factorial)))
+#+END_SRC
+** pattern matching
+#+BEGIN_SRC haskell
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
+#+END_SRC
+** function composition
+#+BEGIN_SRC clojure
+(def twice (partial * 2))
+(def thrice (partial * 3))
+(def six-times (comp twice thrice))
+#+END_SRC
+#+BEGIN_SRC haskell
+twice = (*) 2
+thrice = (*) 3
+sixtimes = twice . thrice
+#+END_SRC
+
+* What are Types?
+
+Types are sets of values.
+
+1 belongs to several types: it's an Integer, a Number, a Value,
+the value 1.
+
+One of the elements of the set of all Values.
+
+One of the elements of the set of all Integers.
+
+The only element in the set of all values that are 1.
+
+1 has the type Value, Integer, Being 1
+
+* What is polymorphism?
+
+** ad hoc polymorphism
+#+BEGIN_SRC clojure
+(defrecord Cow [spotted?])
+(defrecord Duck [daffy?])
+(defmulti talk type)
+(defmethod talk Cow [_] "Muuu")
+(defmethod talk Duck [_] "Quack Quack")
+
+(talk (map->Cow {:spotted? true}))
+(talk (map->Duck {:daffy? true}))
+#+END_SRC
+** subtyping
+#+BEGIN_SRC clojure
+(defrecord Cow [spotted?])
+(defrecord Ostrich [height])
+(defrecord Duck [daffy?])
+(defrecord Goose [silly?])
+(defrecord Dog [grumpy?])
+
+(def h
+  (-> (make-hierarchy)
+      (derive ::bird ::animal)
+      (derive Dog ::animal)
+      (derive Cow ::animal)
+      (derive Duck ::bird)
+      (derive Goose ::bird)
+      (derive Ostrich ::bird)))
+
+(defn dispatch [v] (type v))
+
+(defmulti flies? #'dispatch :hierarchy #'h)
+
+(defmethod flies? ::animal  [_] false)
+(defmethod flies? ::bird    [_] true)
+(defmethod flies? Ostrich [_] false)
+(defmethod flies? Duck [duck] (not (:daffy? duck)))
+
+(flies? #user.Cow{:spotted? true})
+(flies? #user.Goose{:silly? true})
+(flies? #user.Ostrich{:height 100})
+(flies? #user.Duck{:daffy? true})
+(flies? #user.Duck{:daffy? false})
+#+END_SRC
+
+** parametric polymorphism
+#+BEGIN_SRC clojure
+data Duck = Duck | DaffyDuck
+data Horse = Horse
+
+class Walker a where
+  walk :: a -> String
+
+instance Walker Duck where
+  walk Duck = "wobble"
+  walk DaffyDuck = "run"
+
+instance Walker Horse where
+  walk horse = "gallop"
+
+walk_a_lot :: Walker a => a -> [String]
+walk_a_lot walker = take 3 $ repeat (walk walker)
+#+END_SRC

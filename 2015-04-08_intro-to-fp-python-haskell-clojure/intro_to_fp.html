@@ -1,0 +1,874 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Introduction to Functional Programming</title>
+<!-- 2015-04-08 Wed 21:34 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Jean-Louis Giordano (@jellismymind)" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Introduction to Functional Programming</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. What is FP?</a></li>
+<li><a href="#sec-2">2. What is a value?</a></li>
+<li><a href="#sec-3">3. What is an expression?</a></li>
+<li><a href="#sec-4">4. What is evaluation?</a></li>
+<li><a href="#sec-5">5. What is a variable?</a></li>
+<li><a href="#sec-6">6. What are side-effects?</a></li>
+<li><a href="#sec-7">7. Statement</a>
+<ul>
+<li><a href="#sec-7-1">7.1. In Python:</a></li>
+<li><a href="#sec-7-2">7.2. In Clojure and Haskell</a></li>
+<li><a href="#sec-7-3">7.3. Why is that?</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. What is a function?</a></li>
+<li><a href="#sec-9">9. What is the arity of a function?</a></li>
+<li><a href="#sec-10">10. Routine vs Function</a></li>
+<li><a href="#sec-11">11. What is a pure function?</a></li>
+<li><a href="#sec-12">12. Immutable vs Mutable</a></li>
+<li><a href="#sec-13">13. Referencial Transparency</a></li>
+<li><a href="#sec-14">14. What is Application?</a></li>
+<li><a href="#sec-15">15. Higher order function</a></li>
+<li><a href="#sec-16">16. Partial Application</a></li>
+<li><a href="#sec-17">17. Partial Application (bis)</a></li>
+<li><a href="#sec-18">18. How to do things?</a>
+<ul>
+<li><a href="#sec-18-1">18.1. map</a></li>
+<li><a href="#sec-18-2">18.2. filter</a></li>
+<li><a href="#sec-18-3">18.3. reduce / fold</a></li>
+<li><a href="#sec-18-4">18.4. list comprehension / generators</a></li>
+<li><a href="#sec-18-5">18.5. recursion</a></li>
+<li><a href="#sec-18-6">18.6. pattern matching</a></li>
+<li><a href="#sec-18-7">18.7. function composition</a></li>
+</ul>
+</li>
+<li><a href="#sec-19">19. What are Types?</a></li>
+<li><a href="#sec-20">20. What is polymorphism?</a>
+<ul>
+<li><a href="#sec-20-1">20.1. ad hoc polymorphism</a></li>
+<li><a href="#sec-20-2">20.2. subtyping</a></li>
+<li><a href="#sec-20-3">20.3. parametric polymorphism</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<img src="./images/clojure_logo.png" alt="clojure_logo.png" /> <img src="./images/haskell_logo.png" alt="haskell_logo.png" /> <img src="./images/python_logo.png" alt="python_logo.png" />
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> What is FP?</h2>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> What is a value?</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+A value is the final result of a computation.
+</p>
+
+<p>
+The value of 1 + 1 is 2.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> What is an expression?</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+A symbol or combination of symbols that represents a value or a
+relationship between values
+</p>
+
+<p>
+1 + 1 is an expression, it reduces to the value 2.
+</p>
+
+<p>
+2 is also an expression as well as a value.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> What is evaluation?</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Evaluation is the reduction of an expression to its value.
+</p>
+
+<p>
+Evaluate: e- (ex-, out) + value
+"To extract the value"
+</p>
+
+<p>
+Example of evaluation:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">1 + 1 + 1
+1 + 2
+3
+</pre>
+</div>
+<pre class="example">
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> What is a variable?</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+A variable is a reference to a value.
+</p>
+
+<p>
+In:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">a = 2
+</pre>
+</div>
+<p>
+a is a variable, referencing the value 2
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> What are side-effects?</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+A side effect is a step in the evaluation of an expression that has
+effects outside of the expression itself.
+</p>
+
+<p>
+Examples:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">print "hello"
+
+a = 1; a += 1
+</pre>
+</div>
+
+<pre class="example">
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~&gt; Side Effect
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Statement</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+A statement is an expression that evaluates to nothing.
+</p>
+</div>
+
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> In Python:</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+Expression:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">a = 1 + 1
+a = lambda x: x ** 2
+</pre>
+</div>
+
+<p>
+Statement:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">if True:
+  a = "hello"
+else:
+  a = "goodbye"
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> In Clojure and Haskell</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+Only expressions
+</p>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(def a
+  (if true "hello" "goodbye"))
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-haskell">a = if True
+    then "hello"
+    else "goodbye"
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> Why is that?</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+Statements require side effects,
+intrinsically imperative.
+</p>
+
+<pre class="example">
++------------+
+| Statement  |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~&gt; Side Effect
++------------+
+      |
+      X
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> What is a function?</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+A function is an abstraction for an expression, where one or several
+values in the expression are replaced by variables.
+</p>
+
+<p>
+Let's abstract the following expression:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">1 + 1
+
+def inc (x):
+  return x + 1
+
+inc = lambda x: x + 1
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(+ 1 1)
+(def inc (fn [x] (+ x 1)))
+(defn inc [x] (+ x 1))
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-haskell">1 + 1
+inc = \x -&gt; x + 1
+inc x = 1 + x
+</pre>
+</div>
+
+<p>
+Question: Is a function a value?
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> What is the arity of a function?</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+The number of arguments a function takes is its arity.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python"># arity 0
+def zero ():
+  return 0
+
+# arity 1
+def inc (x):
+  return x + 1
+
+# arity 2
+def add (x, y):
+  return x + y
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> Routine vs Function</h2>
+<div class="outline-text-2" id="text-10">
+<p>
+A routine is an abstraction that do not return a value.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">def a (x):
+  print x
+
+def b (x):
+  return x
+</pre>
+</div>
+<p>
+a is a routine, b is a function.
+</p>
+
+<p>
+A procedure can either be a routine or a function.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> What is a pure function?</h2>
+<div class="outline-text-2" id="text-11">
+<p>
+A pure function is a side-effect free function that always maps a
+given input to the same output.
+</p>
+
+<p>
+Which of the following is a pure function?
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">def inc (x):
+  return x + 1
+
+def one (x):
+  print x
+  return x
+
+def rand (x):
+  # non deterministic!
+  return x * random.random()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> Immutable vs Mutable</h2>
+<div class="outline-text-2" id="text-12">
+<p>
+Immutable means that cannot change.
+Think "read only", "constants".
+</p>
+
+<p>
+Persistent Datastructures are immutable,
+and can't be updated in-place.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><span class="section-number-2">13</span> Referencial Transparency</h2>
+<div class="outline-text-2" id="text-13">
+<p>
+An expression that is deterministic and without side-effects is
+referencially transparent.
+</p>
+
+<p>
+It means it can be replaced by its value without changing the
+behaviour of the program.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-14" class="outline-2">
+<h2 id="sec-14"><span class="section-number-2">14</span> What is Application?</h2>
+<div class="outline-text-2" id="text-14">
+<p>
+Calling a function with some arguments is applying that function to
+the value of those arguments.
+</p>
+
+<p>
+Abstraction and Application are the core concepts of functional
+programming.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-python">f(arg1, arg2)
+1 + 2
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(f arg1 arg2)
+(+ 1 2)
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-haskell">f arg1 arg2
+1 + 2
+(+) 1 2
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-15" class="outline-2">
+<h2 id="sec-15"><span class="section-number-2">15</span> Higher order function</h2>
+<div class="outline-text-2" id="text-15">
+<p>
+Functions can return functions, and take functions as argument.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python">def apply (f, x, y):
+  return f(x, y)
+
+apply(add, 1, 2)
+
+def incrementer (n):
+  return lambda m: m + n
+
+add2 = incrementer(2)
+add2(4)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-16" class="outline-2">
+<h2 id="sec-16"><span class="section-number-2">16</span> Partial Application</h2>
+<div class="outline-text-2" id="text-16">
+<p>
+Take a function of arity n, and m &lt; n arguments,
+and return a function of arity n - m.
+</p>
+
+<p>
+Example:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-clojure">(+ 1 2 3)
+((partial +) 1 2 3)
+((partial + 1) 2 3)
+((partial + 1 2) 3)
+((partial + 1 2 3))
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-haskell">1 + 1
+(+) 1 1
+((+) 1) 1
+-- Currying
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-17" class="outline-2">
+<h2 id="sec-17"><span class="section-number-2">17</span> Partial Application (bis)</h2>
+<div class="outline-text-2" id="text-17">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defn part [f &amp; args]
+  (fn [&amp; rest]
+    (apply f (concat args rest))))
+
+((part + 1 2) 3 4)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-18" class="outline-2">
+<h2 id="sec-18"><span class="section-number-2">18</span> How to do things?</h2>
+<div class="outline-text-2" id="text-18">
+</div><div id="outline-container-sec-18-1" class="outline-3">
+<h3 id="sec-18-1"><span class="section-number-3">18.1</span> map</h3>
+<div class="outline-text-3" id="text-18-1">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(map inc [1 2 3])
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-18-2" class="outline-3">
+<h3 id="sec-18-2"><span class="section-number-3">18.2</span> filter</h3>
+<div class="outline-text-3" id="text-18-2">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(filter even? [1 2 3 4])
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-18-3" class="outline-3">
+<h3 id="sec-18-3"><span class="section-number-3">18.3</span> reduce / fold</h3>
+<div class="outline-text-3" id="text-18-3">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(reduce + [1 2 3])
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-18-4" class="outline-3">
+<h3 id="sec-18-4"><span class="section-number-3">18.4</span> list comprehension / generators</h3>
+<div class="outline-text-3" id="text-18-4">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(for [x (range 1 10) :when (even? x)
+      y (range 1 10) :when (odd? y)]
+  (* x y))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-18-5" class="outline-3">
+<h3 id="sec-18-5"><span class="section-number-3">18.5</span> recursion</h3>
+<div class="outline-text-3" id="text-18-5">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defn factorial [n]
+  (if (zero? n)
+    1
+    (* n factorial)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-18-6" class="outline-3">
+<h3 id="sec-18-6"><span class="section-number-3">18.6</span> pattern matching</h3>
+<div class="outline-text-3" id="text-18-6">
+<div class="org-src-container">
+
+<pre class="src src-haskell">factorial 0 = 1
+factorial n = n * factorial (n - 1)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-18-7" class="outline-3">
+<h3 id="sec-18-7"><span class="section-number-3">18.7</span> function composition</h3>
+<div class="outline-text-3" id="text-18-7">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(def twice (partial * 2))
+(def thrice (partial * 3))
+(def six-times (comp twice thrice))
+</pre>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-haskell">twice = (*) 2
+thrice = (*) 3
+sixtimes = twice . thrice
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-19" class="outline-2">
+<h2 id="sec-19"><span class="section-number-2">19</span> What are Types?</h2>
+<div class="outline-text-2" id="text-19">
+<p>
+Types are sets of values.
+</p>
+
+<p>
+1 belongs to several types: it's an Integer, a Number, a Value,
+the value 1.
+</p>
+
+<p>
+One of the elements of the set of all Values.
+</p>
+
+<p>
+One of the elements of the set of all Integers.
+</p>
+
+<p>
+The only element in the set of all values that are 1.
+</p>
+
+<p>
+1 has the type Value, Integer, Being 1
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-20" class="outline-2">
+<h2 id="sec-20"><span class="section-number-2">20</span> What is polymorphism?</h2>
+<div class="outline-text-2" id="text-20">
+</div><div id="outline-container-sec-20-1" class="outline-3">
+<h3 id="sec-20-1"><span class="section-number-3">20.1</span> ad hoc polymorphism</h3>
+<div class="outline-text-3" id="text-20-1">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defrecord Cow [spotted?])
+(defrecord Duck [daffy?])
+(defmulti talk type)
+(defmethod talk Cow [_] "Muuu")
+(defmethod talk Duck [_] "Quack Quack")
+
+(talk (map-&gt;Cow {:spotted? true}))
+(talk (map-&gt;Duck {:daffy? true}))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-20-2" class="outline-3">
+<h3 id="sec-20-2"><span class="section-number-3">20.2</span> subtyping</h3>
+<div class="outline-text-3" id="text-20-2">
+<div class="org-src-container">
+
+<pre class="src src-clojure">(defrecord Cow [spotted?])
+(defrecord Ostrich [height])
+(defrecord Duck [daffy?])
+(defrecord Goose [silly?])
+(defrecord Dog [grumpy?])
+
+(def h
+  (-&gt; (make-hierarchy)
+      (derive ::bird ::animal)
+      (derive Dog ::animal)
+      (derive Cow ::animal)
+      (derive Duck ::bird)
+      (derive Goose ::bird)
+      (derive Ostrich ::bird)))
+
+(defn dispatch [v] (type v))
+
+(defmulti flies? #'dispatch :hierarchy #'h)
+
+(defmethod flies? ::animal  [_] false)
+(defmethod flies? ::bird    [_] true)
+(defmethod flies? Ostrich [_] false)
+(defmethod flies? Duck [duck] (not (:daffy? duck)))
+
+(flies? #user.Cow{:spotted? true})
+(flies? #user.Goose{:silly? true})
+(flies? #user.Ostrich{:height 100})
+(flies? #user.Duck{:daffy? true})
+(flies? #user.Duck{:daffy? false})
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-20-3" class="outline-3">
+<h3 id="sec-20-3"><span class="section-number-3">20.3</span> parametric polymorphism</h3>
+<div class="outline-text-3" id="text-20-3">
+<div class="org-src-container">
+
+<pre class="src src-clojure">data Duck = Duck | DaffyDuck
+data Horse = Horse
+
+class Walker a where
+  walk :: a -&gt; String
+
+instance Walker Duck where
+  walk Duck = "wobble"
+  walk DaffyDuck = "run"
+
+instance Walker Horse where
+  walk horse = "gallop"
+
+walk_a_lot :: Walker a =&gt; a -&gt; [String]
+walk_a_lot walker = take 3 $ repeat (walk walker)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: <span class="timestamp-wrapper"><span class="timestamp">&lt;2015-04-08 Wed&gt;</span></span></p>
+<p class="author">Author: Jean-Louis Giordano (@jellismymind)</p>
+<p class="date">Created: 2015-04-08 Wed 21:34</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
