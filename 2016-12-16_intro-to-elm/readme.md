@@ -1,5 +1,7 @@
 ### Introduction to Elm
 
+http://www.meetup.com/got-lambda/events/226630957/
+
 Simple example to begin with.
 
 - Clone the repository
