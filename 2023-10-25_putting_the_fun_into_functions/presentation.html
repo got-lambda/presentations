@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Putting the <i>fun</i> into functions</title>
+<meta name="author" content="Magnus Therning"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.css"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/theme/night.css" id="theme"/>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide">
+<h1 class="title">Putting the <i>fun</i> into functions</h1><h2 class="author">Magnus Therning</h2><h2 class="date">2023-10-25</h2>
+</section>
+<section>
+<section id="slide-org2416ea9">
+<h2 id="org2416ea9">What is Church encoding</h2>
+<blockquote>
+<p>
+In mathematics, Church encoding is a means of representing data and operators in
+the lambda calculus.
+</p>
+</blockquote>
+
+<div style="font-size: 75%">
+<p>
+<a href="https://en.wikipedia.org/wiki/Church_encoding">https://en.wikipedia.org/wiki/Church_encoding</a>
+</p>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org3cf7064">
+<h2 id="org3cf7064">Types as functions</h2>
+<p>
+We've all seen integers represented as functions
+</p>
+
+<div data-fragment-index="1" class="fragment">
+\begin{align}
+zero & = λf.λx.x \\
+one & = λf.λx.f x \\
+two & = λf.λx.f (f x) \\
+...
+\end{align}
+
+</div>
+
+<p data-fragment-index="2" class="fragment">
+Let's go a bit further and represent Algebraic Data Types as functions.
+</p>
+
+<div style="font-size: 75%">
+<p data-fragment-index="2" class="fragment">
+Also, let's use Python for readability.
+</p>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org289d4a9">
+<h2 id="org289d4a9">Algebraic Data Types</h2>
+<ul data-fragment-index="1" class="fragment">
+<li>Product types (tuples and records)</li>
+<li>Sum types (tagged/disjoint unions, coproduct types, variant types)</li>
+
+</ul>
+
+<div style="font-size: 75%">
+<p data-fragment-index="2" class="fragment">
+Algebraic data types were introduced in Hope, a small functional programming
+language developed in the 1970s at the University of Edinburgh.
+</p>
+
+<p data-fragment-index="2" class="fragment">
+<a href="https://en.wikipedia.org/wiki/Algebraic_data_type" data-fragment-index="2" class="fragment">https://en.wikipedia.org/wiki/Algebraic_data_type</a>
+</p>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org70c1aa2">
+<h2 id="org70c1aa2">Description of the idea</h2>
+<p>
+The instance of a sum type is a higher-order function where each argument
+"handles" one constructor. Make one function for each constructor that captures
+the product's values.
+</p>
+
+<p data-fragment-index="1" class="fragment">
+Simple example: <code>Maybe a</code>
+</p>
+
+<div class="org-src-container">
+
+<pre data-fragment-index="1" class="fragment"><span style="color: #cba6f7;">data</span> <span style="color: #f9e2af;">Maybe</span> a = Nothing | Just a
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre data-fragment-index="2" class="fragment"><span style="color: #6c7086;"># </span><span style="color: #6c7086;">Nothing</span>
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">nothing</span><span style="color: #f38ba8;">()</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">c_nothing</span><span style="color: #f38ba8;">(</span>with_nothing, with_just<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> with_nothing<span style="color: #f38ba8;">()</span>
+    <span style="color: #cba6f7;">return</span> c_nothing
+<span style="color: #6c7086;"># </span><span style="color: #6c7086;">Just a</span>
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">just</span><span style="color: #f38ba8;">(</span>a<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">c_just</span><span style="color: #f38ba8;">(</span>with_nothing, with_just<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> with_just<span style="color: #f38ba8;">(</span>a<span style="color: #f38ba8;">)</span>
+    <span style="color: #cba6f7;">return</span> c_just
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgc346b2b">
+<h2 id="orgc346b2b">Using the type</h2>
+<p>
+Construct an instance using the constructors functions, then pass in the
+"handler functions".
+</p>
+
+<div class="org-src-container">
+
+<pre class="fragment">nothing<span style="color: #f38ba8;">()(</span><span style="color: #cba6f7;">lambda</span>: <span style="color: #f38ba8;">print</span><span style="color: #fab387;">(</span><span style="color: #a6e3a1;">'got nothing'</span><span style="color: #fab387;">)</span>,
+    <span style="color: #49155a5a8019;"> </span>     <span style="color: #cba6f7;">lambda</span> x: <span style="color: #f38ba8;">print</span><span style="color: #fab387;">(</span>f<span style="color: #a6e3a1;">'got just: </span>{x}<span style="color: #a6e3a1;">'</span><span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+
+just<span style="color: #f38ba8;">(</span>42<span style="color: #f38ba8;">)(</span><span style="color: #cba6f7;">lambda</span>: <span style="color: #f38ba8;">print</span><span style="color: #fab387;">(</span><span style="color: #a6e3a1;">'got nothing'</span><span style="color: #fab387;">)</span>,
+    <span style="color: #49155a5a8019;"> </span>    <span style="color: #cba6f7;">lambda</span> x: <span style="color: #f38ba8;">print</span><span style="color: #fab387;">(</span>f<span style="color: #a6e3a1;">'got just: </span>{x}<span style="color: #a6e3a1;">'</span><span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgb3d6ae1">
+<h2 id="orgb3d6ae1">Mathematical expression</h2>
+<p>
+A simple mathemaical expression.
+</p>
+
+<div style="font-size: 75%">
+<p>
+Just addition of numbers.
+</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-haskell"><span style="color: #cba6f7;">data</span> <span style="color: #f9e2af;">MathsExp</span> = Num <span style="color: #f9e2af;">Int</span>
+              | Add <span style="color: #f9e2af;">MathsExp</span> <span style="color: #f9e2af;">MathsExp</span>
+</pre>
+</div>
+</section>
+<section id="slide-org60b7c8b">
+<h3 id="org60b7c8b">Mathematical expression: Church encoding</h3>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">num</span><span style="color: #f38ba8;">(</span>n<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">c_num</span><span style="color: #f38ba8;">(</span>with_num, with_add<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> with_num<span style="color: #f38ba8;">(</span>n<span style="color: #f38ba8;">)</span>
+
+    <span style="color: #cba6f7;">return</span> c_num
+
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">add</span><span style="color: #f38ba8;">(</span>a, b<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">c_add</span><span style="color: #f38ba8;">(</span>with_num, with_add<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> with_add<span style="color: #f38ba8;">(</span>a<span style="color: #fab387;">(</span>with_num, with_add<span style="color: #fab387;">)</span>,
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #49155a5a8019;"> </span>   <span style="color: #49155a5a8019;"> </span>   <span style="color: #49155a5a8019;"> </span>   <span style="color: #49155a5a8019;"> </span>   b<span style="color: #fab387;">(</span>with_num, with_add<span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+
+    <span style="color: #cba6f7;">return</span> c_add
+
+</pre>
+</div>
+</section>
+<section id="slide-orgac89b6e">
+<h3 id="orgac89b6e">Mathematical expression: usage (0)</h3>
+<p>
+First define an expression
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cdd6f4;">a</span> <span style="color: #89dceb;">=</span> add<span style="color: #f38ba8;">(</span>num<span style="color: #fab387;">(</span>10<span style="color: #fab387;">)</span>, num<span style="color: #fab387;">(</span>2<span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+</section>
+<section id="slide-org1c43075">
+<h3 id="org1c43075">Mathematical expression: usage (1)</h3>
+<p>
+Calculating the expression
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">calc_num</span><span style="color: #f38ba8;">(</span>n<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">return</span> n
+
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">calc_add</span><span style="color: #f38ba8;">(</span>a, b<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">return</span> a <span style="color: #89dceb;">+</span> b
+
+a<span style="color: #f38ba8;">(</span>calc_num, calc_add<span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+</section>
+<section id="slide-orge8ea042">
+<h3 id="orge8ea042">Mathematical expression: usage (2)</h3>
+<p>
+Convert the expression to a string
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">str_num</span><span style="color: #f38ba8;">(</span>n<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">return</span> <span style="color: #f38ba8;">str</span><span style="color: #f38ba8;">(</span>n<span style="color: #f38ba8;">)</span>
+
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">str_add</span><span style="color: #f38ba8;">(</span>a, b<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">return</span> a <span style="color: #89dceb;">+</span> <span style="color: #a6e3a1;">' + '</span> <span style="color: #89dceb;">+</span> b
+
+a<span style="color: #f38ba8;">(</span>str_num, str_add<span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgaf37285">
+<h2 id="orgaf37285">List</h2>
+<div class="org-src-container">
+
+<pre class="src src-haskell"><span style="color: #cba6f7;">data</span> <span style="color: #f9e2af;">List</span> a = Nil
+             | Cons a <span style="color: #f9e2af;">List</span>
+</pre>
+</div>
+</section>
+<section id="slide-org95f36d7">
+<h3 id="org95f36d7">List: Church encoding</h3>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">nil</span><span style="color: #f38ba8;">()</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">c_nil</span><span style="color: #f38ba8;">(</span>f_nil, f_cons<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> f_nil<span style="color: #f38ba8;">()</span>
+    <span style="color: #cba6f7;">return</span> c_nil
+
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">cons</span><span style="color: #f38ba8;">(</span>hd, tl<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">c_cons</span><span style="color: #f38ba8;">(</span>f_nil, f_cons<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> f_cons<span style="color: #f38ba8;">(</span>hd, tl<span style="color: #fab387;">(</span>f_nil, f_cons<span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+    <span style="color: #cba6f7;">return</span> c_cons
+</pre>
+</div>
+</section>
+<section id="slide-org263f92f">
+<h3 id="org263f92f">List: usage (0)</h3>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">str_nil</span><span style="color: #f38ba8;">()</span>:
+    <span style="color: #cba6f7;">return</span> <span style="color: #a6e3a1;">'nil'</span>
+
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">str_cons</span><span style="color: #f38ba8;">(</span>hd, tl<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">return</span> <span style="color: #f38ba8;">str</span><span style="color: #f38ba8;">(</span>hd<span style="color: #f38ba8;">)</span> <span style="color: #89dceb;">+</span> <span style="color: #a6e3a1;">','</span> <span style="color: #89dceb;">+</span> tl
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cdd6f4;">lst</span> <span style="color: #89dceb;">=</span> cons<span style="color: #f38ba8;">(</span>1, cons<span style="color: #fab387;">(</span>2, nil<span style="color: #f9e2af;">()</span><span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+lst<span style="color: #f38ba8;">(</span>str_nil, str_cons<span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+</section>
+<section id="slide-org139292b">
+<h3 id="org139292b">List: functions on lists</h3>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">lappend</span><span style="color: #f38ba8;">(</span>l0, l1<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">app_nil</span><span style="color: #f38ba8;">()</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> l1
+
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">app_cons</span><span style="color: #f38ba8;">(</span>hd, tl<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> cons<span style="color: #f38ba8;">(</span>hd, tl<span style="color: #f38ba8;">)</span>
+
+    <span style="color: #cba6f7;">return</span> l0<span style="color: #f38ba8;">(</span>app_nil, app_cons<span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">lmap</span><span style="color: #f38ba8;">(</span>f, l<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">map_nil</span><span style="color: #f38ba8;">()</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> nil<span style="color: #f38ba8;">()</span>
+
+    <span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">map_cons</span><span style="color: #f38ba8;">(</span>hd, tl<span style="color: #f38ba8;">)</span>:
+    <span style="color: #49155a5a8019;"> </span>   <span style="color: #cba6f7;">return</span> cons<span style="color: #f38ba8;">(</span>f<span style="color: #fab387;">(</span>hd<span style="color: #fab387;">)</span>, tl<span style="color: #f38ba8;">)</span>
+
+    <span style="color: #cba6f7;">return</span> l<span style="color: #f38ba8;">(</span>map_nil, map_cons<span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+</section>
+<section id="slide-orgeef6bc2">
+<h3 id="orgeef6bc2">List: usage (1)</h3>
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">str_nil</span><span style="color: #f38ba8;">()</span>:
+    <span style="color: #cba6f7;">return</span> <span style="color: #a6e3a1;">'nil'</span>
+
+<span style="color: #cba6f7;">def</span> <span style="color: #89b4fa;">str_cons</span><span style="color: #f38ba8;">(</span>hd, tl<span style="color: #f38ba8;">)</span>:
+    <span style="color: #cba6f7;">return</span> <span style="color: #f38ba8;">str</span><span style="color: #f38ba8;">(</span>hd<span style="color: #f38ba8;">)</span> <span style="color: #89dceb;">+</span> <span style="color: #a6e3a1;">','</span> <span style="color: #89dceb;">+</span> tl
+
+<span style="color: #cdd6f4;">lst0</span> <span style="color: #89dceb;">=</span> cons<span style="color: #f38ba8;">(</span>1, cons<span style="color: #fab387;">(</span>2, nil<span style="color: #f9e2af;">()</span><span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+<span style="color: #cdd6f4;">lst1</span> <span style="color: #89dceb;">=</span> cons<span style="color: #f38ba8;">(</span>3, cons<span style="color: #fab387;">(</span>4, nil<span style="color: #f9e2af;">()</span><span style="color: #fab387;">)</span><span style="color: #f38ba8;">)</span>
+
+lappend<span style="color: #f38ba8;">(</span>lst0, lst1<span style="color: #f38ba8;">)(</span>str_nil, str_cons<span style="color: #f38ba8;">)</span>
+
+lmap<span style="color: #f38ba8;">(</span><span style="color: #cba6f7;">lambda</span> x: x <span style="color: #89dceb;">*</span> x, lappend<span style="color: #fab387;">(</span>lst0, lst1<span style="color: #fab387;">)</span><span style="color: #f38ba8;">)(</span>str_nil, str_cons<span style="color: #f38ba8;">)</span>
+</pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgeedf1ac">
+<h2 id="orgeedf1ac">Fini</h2>
+</section>
+</section>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/plugin/markdown/markdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/plugin/search/search.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/plugin/zoom/zoom.js"></script>
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+mouseWheel: false,
+fragmentInURL: false,
+hashOneBasedIndex: false,
+pdfSeparateFragments: true,
+overview: true,
+
+transition: 'convex',
+transitionSpeed: 'default',
+
+// Plugins with reveal.js 4.x
+plugins: [ RevealMarkdown, RevealNotes, RevealSearch, RevealZoom ],
+
+// Optional libraries used to extend reveal.js
+dependencies: [
+]
+
+});
+</script>
+</body>
+</html>
